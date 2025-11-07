@@ -1,0 +1,29 @@
+name: Ensure Security Group Dispatch
+run-name: ${{ github.event.client_payload.dispatch_payload.current_step }}:${{ github.event.client_payload.dispatch_job_id }}
+
+on:
+  repository_dispatch:
+    types: [ensure-security-group]
+
+jobs:
+  perform-service-operation:
+    runs-on: windows-latest
+
+    steps:
+    - name: "OnfusionCoE: Ensure Security Group Dispatch"
+      id: "ens-sec-grp"
+      uses: fusioncoe/onfusioncoe-actions-g2/ensure-security-group@v0
+      with:
+        client_id: ${{ vars.FUSIONCOE_SP_APPLICATION_ID }}
+        client_secret: ${{ secrets.FUSIONCOE_SP_SECRET }}
+        tenant_id: ${{ vars.FUSIONCOE_SP_TENANT_ID }}
+        authority: ${{ vars.FUSIONCOE_SP_AUTHORITY }}        
+        cloud: ${{ vars.FUSIONCOE_SP_CLOUD }}
+        event_path: ${{ github.event_path }}
+        output_private_key: ${{ secrets.FUSIONCOE_SP_PRIVATE_KEY }}
+
+
+    - name: security-grp-obj-id:${{ steps.ens-sec-grp.outputs.object_id}} 
+      shell: pwsh    
+      run: |
+        echo "Output: ${{ steps.ens-sec-grp.outputs.object_id}}"         
